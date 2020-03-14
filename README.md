@@ -54,9 +54,8 @@ dzn -s https://dezyne.verum.com/service/2.9 -u "< user_email >" -p hello
 Test and see if ```dzn --version``` lets you know you are running dzn 2.9.1
 
 
-In case you haven't you should also have ```make``` and ```g++``` on your system. Go ahead and install them with
-```apt install g++ make```
-
+In case you haven't you should also have ```make``` and ```g++``` on your system. You probably also want wiring pi:  ```apt install g++ make wiringpi```
+ 
 ### Using dezyne
 
 Most likely you have made your dezyne model on your local machine. 
@@ -65,13 +64,12 @@ If not don't worry, we will do it all again on your pi!
 
 I heavily suggest using git, go ahead and pull your dezyne code onto your machine.
 
-You are now in your code directory with a bunch of dzn files and nother else.
-This is the place where you might start using the make file found in their tutorials. However in the repository I have a slightly
-altered Makefile which keeps things a bit more clean.
+You are now in your code directory with a bunch of dzn files.
+This is the place where you might start using the make file found in their tutorials. However in this repository there is a slightly
+altered Makefile which keeps things cleaner.
 
 #### Why should we use makefiles?
-Makefiles can been as generators of a bunch of commands that deal with setting up everything so you can compile with just a single command
-. Which is something that shouldn't be taken for granted! You can just copy the file in this repository and place it into the root of your project.
+Makefiles can been as generators of a bunch of shell commands that deal with setting up everything so you can compile with just a single command. Which is something that shouldn't be taken for granted!!! Copy your desired makefile into the root of your directory. Make files are required to be named ```[M/m]akefile``` and can be invoked with ```make <command>```. It is customary the invoking make without any command should build your executable (and all of that what it requires to do so).
 
 The Dezyne makefile contains a few commands
 
@@ -80,7 +78,6 @@ This will download the required runtime for dezyne
 
 ```make generate```
 This will take all of the .dzn files in your current directory and will generate c++ code in the src/ (or if you are using the edited makefile into src_dzn)
-
 
 ```make```
 Just using make will try to build the application
@@ -92,5 +89,7 @@ This will remove compile artifacts
 This will remove dzn generation junk, as well as the runtime.
 
 
+### Compiling a pure dezyne program
+Execute the first 3 commands listed above
 
 
