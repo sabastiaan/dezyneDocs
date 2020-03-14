@@ -92,4 +92,88 @@ This will remove dzn generation junk, as well as the runtime.
 ### Compiling a pure dezyne program
 Execute the first 3 commands listed above
 
+Eventually you will need to integrate the native c++ code you wrote into design. 
+To let design know you want to use your own implementation you need to have a dezyne ```component``` with an empty ```behaviour```
+Example:
+```
+interface ISystem{
+  in void enable();
+}
 
+component System{
+  provides ISystem sys;
+  
+  behaviour{
+  }
+}
+```
+It is important to prefix your interface with an I due to how dezyne chooses names for their generated files (citiation needed).
+
+For each given dezyne file it will generate an <name>.hh and <name>.cc
+Inside of the .hh you can find the declaration of for example your component (and hence the interface).
+Typically the .cc will be filled with code if you gave the behaviour an implementation. However if it body is empty
+ it will also generate an empty .cc file. You shouldn't put code in here because of the risk of being overwritten by the code generator.
+
+
+Now create a header file (ending with .hh) with the same name as your interface, but without the I prefix in your source directory.
+Include the dezyne file with ```#include "[src/src_dzn]/ISystem.hh"```
+Only the header file needs to be included. Keep in mind that your implementation might be included more than once!
+Because of this you want to wrap your file with [header guards](https://stackoverflow.com/a/4767305/8668536) 
+
+#### Implementing functions declared in dezyne with c++
+
+Create a class with the same name as your component and inherit the dezyne generated class.
+``` class System : skell::System { } ``` 
+By convention dezyne will generate all their code in the skell namespace. A namespace is like a special name prefix but then baked into the language so you can do more fancy stuff with it, just ignore it for now.
+
+If you would compile your program now it would not work. 
+This is because the new class misses still a few things:
+1. the class should have a constructor accepting the dzn locator 
+2. it *requires* you to implement all of the functions specified in the interface
+
+The first one is eassily fixed:
+``` class System : skell::System { 
+public:
+  System(const dzn::locator& loc); 
+} 
+``` 
+The second one be done in two ways:
+
+1. inline
+```
+//System.hh
+#ifndef __System.hh__
+#define __System.hh__
+
+class System : skell::System { 
+private:
+ void enable() { /* implementation */ } 
+ // the next function does not need the private modifier again
+
+public:
+  System(const dzn::locator& loc); 
+} 
+#endif
+``` 
+
+2. split up
+C and C++ allow you to declare and implement a function in two different places as long as the declaration precedes it.
+```
+int sum(int a, int b); //No body
+
+int sum(int a, int b) { return a +b } // might be a different file
+```
+This means we can also split up our implementation of our code by adding an extra file with a ```.cc``` extension like so
+
+```
+//System.cc
+//no header guards are required because this file won't be included by others
+#include "System.hh"
+
+System::enable() {
+
+}
+```
+
+
+What is left is the code initialization of dezyne, which is best explained [here](https://www.verum.com/dzndoc/tutorials-code-integration-tutorial-expanding-the-alarmsystem/)
